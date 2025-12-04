@@ -13,7 +13,7 @@ import {
 } from "../services/userService";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { z } from "zod";
-import { Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 
 const router = Router();
 

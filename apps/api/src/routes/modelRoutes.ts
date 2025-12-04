@@ -7,7 +7,7 @@ import {
   listModelRuns,
   trainModel,
 } from "../services/modelService";
-import { Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 
 const router = Router();
 

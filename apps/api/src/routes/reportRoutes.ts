@@ -6,7 +6,7 @@ import {
   exportReportToExcel,
   exportReportToPdf,
 } from "../services/reportService";
-import { Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 
 const router = Router();
 

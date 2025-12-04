@@ -16,7 +16,7 @@ import {
   updateRegency,
   updateRegencySchema,
 } from "../services/regionService";
-import { Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 
 const router = Router();
 

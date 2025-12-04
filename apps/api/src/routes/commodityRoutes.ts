@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
-import { Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
 import {

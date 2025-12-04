@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import { Role } from "@prisma/client";
+import type { Role } from "@prisma/client";
 import { verifyAccessToken } from "../utils/jwt";
 
 export function authMiddleware(
