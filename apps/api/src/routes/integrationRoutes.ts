@@ -2,7 +2,10 @@ import { Router } from "express";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
-import { syncGovernmentPrices } from "../services/govPriceService";
+import {
+  listGovernmentSyncLogs,
+  syncGovernmentPrices,
+} from "../services/govPriceService";
 
 const router = Router();
 
@@ -35,6 +38,23 @@ router.post(
         message: "Sinkronisasi data harga dari API pemerintah berhasil",
         result,
       });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
+/**
+ * Mengambil riwayat sinkronisasi terbaru dari API pemerintah.
+ */
+router.get(
+  "/gov/sync-logs",
+  authMiddleware,
+  requireRole("ADMIN", "ANALYST"),
+  async (_req, res, next) => {
+    try {
+      const logs = await listGovernmentSyncLogs(20);
+      res.json(logs);
     } catch (err) {
       next(err);
     }

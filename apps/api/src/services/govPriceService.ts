@@ -20,6 +20,18 @@ export interface GovSyncResult {
 type GovApiRow = Record<string, unknown>;
 
 /**
+ * Ambil daftar riwayat sinkronisasi data harga dari API pemerintah.
+ */
+export async function listGovernmentSyncLogs(limit = 20) {
+  const logs = await prisma.syncLog.findMany({
+    orderBy: { runAt: "desc" },
+    take: limit,
+  });
+
+  return logs;
+}
+
+/**
  * Sinkronisasi data harga dari API pemerintah Indonesia ke tabel DailyPrice.
  *
  * Catatan penting:
@@ -128,9 +140,7 @@ export async function syncGovernmentPrices(
         row["commodity_id"] ??
         row["commodityId"] ??
         null) as string | number | null;
-    const dateRaw = (row["tanggal"] ?? row["date"] ?? null) as
-      | string
-      | null;
+    const dateRaw = (row["tanggal"] ?? row["date"] ?? null) as string | null;
     const priceRaw = (row["harga"] ?? row["price"] ?? null) as
       | string
       | number

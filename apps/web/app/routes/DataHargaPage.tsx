@@ -61,6 +61,32 @@ export function DataHargaPage() {
     onSuccess: () => {
       // Harga yang baru tersinkronisasi bisa langsung muncul di tabel manual
       queryClient.invalidateQueries({ queryKey: ["prices"] });
+      queryClient.invalidateQueries({ queryKey: ["gov-sync-logs"] });
+    },
+  });
+
+  interface SyncLogRow {
+    id: number;
+    status: string;
+    runAt: string;
+    records: number;
+    errorMessage: string | null;
+    details: {
+      from?: string;
+      to?: string;
+      inserted?: number;
+      updated?: number;
+      skipped?: number;
+      [key: string]: unknown;
+    } | null;
+  }
+
+  const syncLogsQuery = useQuery<SyncLogRow[]>({
+    queryKey: ["gov-sync-logs"],
+    enabled: mode === "api",
+    queryFn: async () => {
+      const res = await apiClient.get("/integrations/gov/sync-logs");
+      return res.data;
     },
   });
 
@@ -436,6 +462,128 @@ export function DataHargaPage() {
                   <code className="rounded bg-slate-800 px-1">SyncLog</code>.
                 </li>
               </ol>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-slate-800 bg-slate-950/60 p-3">
+            <h3 className="text-[11px] font-semibold text-slate-200">
+              Riwayat Sinkronisasi Terakhir
+            </h3>
+            <p className="mt-1 text-[11px] text-slate-400">
+              Tabel ini menampilkan beberapa proses sinkronisasi terakhir dari
+              API pemerintah beserta jumlah data yang berhasil dimuat.
+            </p>
+
+            <div className="mt-2 max-h-52 overflow-y-auto text-[11px] scrollbar-thin">
+              {syncLogsQuery.isLoading && (
+                <p className="text-slate-400">Memuat riwayat sinkronisasi...</p>
+              )}
+              {syncLogsQuery.isError && (
+                <p className="text-red-400">
+                  Gagal memuat riwayat sinkronisasi. Coba beberapa saat lagi.
+                </p>
+              )}
+              {syncLogsQuery.data && syncLogsQuery.data.length === 0 && (
+                <p className="text-slate-400">
+                  Belum ada riwayat sinkronisasi yang tercatat.
+                </p>
+              )}
+              {syncLogsQuery.data && syncLogsQuery.data.length > 0 && (
+                <table className="mt-1 min-w-full border-collapse">
+                  <thead className="sticky top-0 bg-slate-900">
+                    <tr className="text-left uppercase text-[10px] text-slate-400">
+                      <th className="px-2 py-1">Waktu</th>
+                      <th className="px-2 py-1">Status</th>
+                      <th className="px-2 py-1">Rentang</th>
+                      <th className="px-2 py-1">Rekaman</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {syncLogsQuery.data.map((log) => {
+                      const from =
+                        log.details && typeof log.details.from === "string"
+                          ? log.details.from
+                          : undefined;
+                      const to =
+                        log.details && typeof log.details.to === "string"
+                          ? log.details.to
+                          : undefined;
+                      const inserted =
+                        log.details && typeof log.details.inserted === "number"
+                          ? log.details.inserted
+                          : undefined;
+                      const updated =
+                        log.details && typeof log.details.updated === "number"
+                          ? log.details.updated
+                          : undefined;
+                      const skipped =
+                        log.details && typeof log.details.skipped === "number"
+                          ? log.details.skipped
+                          : undefined;
+
+                      return (
+                        <tr
+                          key={log.id}
+                          className="border-t border-slate-800 align-top"
+                        >
+                          <td className="px-2 py-1">
+                            {new Date(log.runAt).toLocaleString("id-ID", {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })}
+                          </td>
+                          <td className="px-2 py-1">
+                            <span
+                              className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                                log.status === "SUCCESS"
+                                  ? "bg-emerald-500/20 text-emerald-300"
+                                  : log.status === "FAILED"
+                                    ? "bg-red-500/20 text-red-300"
+                                    : "bg-slate-600/30 text-slate-200"
+                              }`}
+                            >
+                              {log.status}
+                            </span>
+                          </td>
+                          <td className="px-2 py-1">
+                            {from && to ? `${from} s/d ${to}` : "-"}
+                          </td>
+                          <td className="px-2 py-1">
+                            <div>
+                              <span className="font-semibold">
+                                {log.records}
+                              </span>{" "}
+                              baris
+                            </div>
+                            {(inserted || updated || skipped) && (
+                              <div className="text-[10px] text-slate-400">
+                                {inserted !== undefined && (
+                                  <span>+{inserted} baru</span>
+                                )}
+                                {updated !== undefined && (
+                                  <span className="ml-1">
+                                    / {updated} diperbarui
+                                  </span>
+                                )}
+                                {skipped !== undefined && (
+                                  <span className="ml-1">
+                                    / {skipped} dilewati
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            {log.errorMessage && (
+                              <div className="mt-0.5 text-[10px] text-red-400">
+                                {log.errorMessage}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
         </div>
