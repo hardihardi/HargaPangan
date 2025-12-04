@@ -1,0 +1,183 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Province {
+  id          Int             @id @default(autoincrement())
+  name        String
+  code        String          @unique // kode_provinsi (misal kode BPS)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  regencies   Regency[]
+  dailyPrices DailyPrice[]
+  predictions PricePrediction[]
+}
+
+model Regency {
+  id          Int             @id @default(autoincrement())
+  name        String
+  code        String
+  provinceId  Int
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  province    Province        @relation(fields: [provinceId], references: [id])
+  dailyPrices DailyPrice[]
+  predictions PricePrediction[]
+
+  @@unique([provinceId, code])
+}
+
+model Commodity {
+  id          Int             @id @default(autoincrement())
+  name        String
+  category    String
+  unit        String
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  dailyPrices DailyPrice[]
+  predictions PricePrediction[]
+}
+
+model DailyPrice {
+  id          Int             @id @default(autoincrement())
+  provinceId  Int
+  regencyId   Int
+  commodityId Int
+  date        DateTime
+  price       Decimal         @db.Numeric(12, 2)
+  source      String
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  province    Province        @relation(fields: [provinceId], references: [id])
+  regency     Regency         @relation(fields: [regencyId], references: [id])
+  commodity   Commodity       @relation(fields: [commodityId], references: [id])
+
+  @@unique([provinceId, regencyId, commodityId, date])
+}
+
+model PricePrediction {
+  id             Int       @id @default(autoincrement())
+  provinceId     Int
+  regencyId      Int
+  commodityId    Int
+  predictionDate DateTime
+  predictedPrice Decimal   @db.Numeric(12, 2)
+  modelName      String
+  createdAt      DateTime  @default(now())
+
+  province       Province  @relation(fields: [provinceId], references: [id])
+  regency        Regency   @relation(fields: [regencyId], references: [id])
+  commodity      Commodity @relation(fields: [commodityId], references: [id])
+
+  @@unique([provinceId, regencyId, commodityId, predictionDate])
+  @@index([commodityId, predictionDate])
+}
+
+enum Role {
+  ADMIN
+  ANALYST
+  VIEWER
+}
+
+model User {
+  id           Int        @id @default(autoincrement())
+  name         String
+  email        String     @unique
+  passwordHash String
+  role         Role       @default(VIEWER)
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  auditLogs    AuditLog[]
+  refreshTokens RefreshToken[]
+}
+
+model RefreshToken {
+  id         Int       @id @default(autoincrement())
+  userId     Int
+  token      String    @unique
+  expiresAt  DateTime
+  createdAt  DateTime  @default(now())
+  revokedAt  DateTime?
+
+  user       User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
+
+model ModelTrainingRun {
+  id           Int       @id @default(autoincrement())
+  modelName    String
+  modelType    String
+  startedAt    DateTime  @default(now())
+  finishedAt   DateTime?
+  status       String    // SUCCESS, FAILED
+  rmse         Float?
+  mae          Float?
+  mape         Float?
+  precision    Float?
+  recall       Float?
+  f1           Float?
+  rocAuc       Float?
+  errorMessage String?
+}
+
+model SystemSetting {
+  id                   Int      @id @default(1)
+  priceSpikeThreshold  Float    @default(10) // persentase lonjakan harga
+  timezone             String   @default("Asia/Jakarta")
+  language             String   @default("id")
+}
+
+model AuditLog {
+  id        Int       @id @default(autoincrement())
+  userId    Int?
+  action    String
+  entity    String?
+  entityId  Int?
+  createdAt DateTime  @default(now())
+  metadata  Json?
+
+  user      User?     @relation(fields: [userId], references: [id])
+}
+
+model ExternalApiConfig {
+  id        Int       @id @default(autoincrement())
+  name      String
+  baseUrl   String
+  apiKey    String?
+  enabled   Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  syncLogs  SyncLog[]
+}
+
+model SyncLog {
+  id            Int               @id @default(autoincrement())
+  externalApiId Int?
+  status        String            // SUCCESS, FAILED, PARTIAL
+  runAt         DateTime @default(now())
+  records       Int
+  errorMessage  String?
+  details       Json?
+
+  externalApi   ExternalApiConfig? @relation(fields: [externalApiId], references: [id])
+}
+
+model DashboardCache {
+  id        Int       @id @default(1)
+  payload   Json
+  refreshedAt DateTime @default(now())
+}
