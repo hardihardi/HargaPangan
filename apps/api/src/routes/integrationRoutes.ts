@@ -3,7 +3,6 @@ import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
 import { syncGovernmentPrices } from "../services/govPriceService";
-import { Role } from "@prisma/client";
 
 const router = Router();
 
@@ -21,7 +20,7 @@ const syncQuerySchema = z.object({
 router.post(
   "/gov/prices/sync",
   authMiddleware,
-  requireRole(Role.ADMIN, Role.ANALYST),
+  requireRole("ADMIN", "ANALYST"),
   validateRequest({ query: syncQuerySchema }),
   async (req, res, next) => {
     try {

@@ -7,7 +7,6 @@ import {
   listModelRuns,
   trainModel,
 } from "../services/modelService";
-import { Role } from "@prisma/client";
 
 const router = Router();
 
@@ -27,7 +26,7 @@ router.get(
 router.get(
   "/runs",
   authMiddleware,
-  requireRole(Role.ADMIN, Role.ANALYST),
+  requireRole("ADMIN", "ANALYST"),
   async (_req, res, next) => {
     try {
       const runs = await listModelRuns();
@@ -41,7 +40,7 @@ router.get(
 router.post(
   "/train",
   authMiddleware,
-  requireRole(Role.ADMIN, Role.ANALYST),
+  requireRole("ADMIN", "ANALYST"),
   validateRequest({
     body: z.object({
       modelName: z.string().min(1),

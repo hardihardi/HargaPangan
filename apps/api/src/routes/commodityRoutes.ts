@@ -81,7 +81,7 @@ router.post(
 router.delete(
   "/:id",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
   }),

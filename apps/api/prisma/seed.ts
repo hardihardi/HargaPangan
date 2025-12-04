@@ -1,4 +1,4 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -161,7 +161,7 @@ async function main() {
       name: "Admin Utama",
       email: "admin@pangan.local",
       passwordHash,
-      role: Role.ADMIN,
+      role: "ADMIN",
       isActive: true,
     },
   });
@@ -173,7 +173,7 @@ async function main() {
       name: "Analis Harga",
       email: "analis@pangan.local",
       passwordHash,
-      role: Role.ANALYST,
+      role: "ANALYST",
       isActive: true,
     },
   });
@@ -185,7 +185,7 @@ async function main() {
       name: "Viewer Dashboard",
       email: "viewer@pangan.local",
       passwordHash,
-      role: Role.VIEWER,
+      role: "VIEWER",
       isActive: true,
     },
   });

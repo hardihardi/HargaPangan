@@ -6,7 +6,6 @@ import {
   exportReportToExcel,
   exportReportToPdf,
 } from "../services/reportService";
-import { Role } from "@prisma/client";
 
 const router = Router();
 
@@ -21,7 +20,7 @@ const reportQuerySchema = z.object({
 router.get(
   "/weekly",
   authMiddleware,
-  requireRole(Role.ADMIN, Role.ANALYST),
+  requireRole("ADMIN", "ANALYST"),
   validateRequest({ query: reportQuerySchema }),
   async (req, res, next) => {
     try {
@@ -68,7 +67,7 @@ router.get(
 router.get(
   "/monthly",
   authMiddleware,
-  requireRole(Role.ADMIN, Role.ANALYST),
+  requireRole("ADMIN", "ANALYST"),
   validateRequest({ query: reportQuerySchema }),
   async (req, res, next) => {
     try {

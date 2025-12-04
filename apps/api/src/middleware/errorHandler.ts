@@ -8,6 +8,10 @@ export function errorHandler(
   res: Response,
   _next: NextFunction,
 ) {
+  // Mark _next as used to satisfy linting while tetap mempertahankan
+  // signature middleware error Express (4 argumen).
+  void _next;
+
   if (err instanceof ZodError) {
     return res.status(400).json({
       message: "Validasi gagal",

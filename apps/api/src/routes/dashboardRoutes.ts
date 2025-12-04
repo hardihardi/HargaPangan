@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { authMiddleware } from "../middleware/authMiddleware";
 import { getDashboardSummary } from "../services/dashboardService";
 
 const router = Router();

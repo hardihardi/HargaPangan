@@ -64,7 +64,8 @@ export async function login(input: z.infer<typeof loginSchema>) {
 }
 
 export async function refreshSession(refreshToken: string) {
-  const decoded = verifyRefreshToken(refreshToken);
+  // Pastikan token refresh valid dan belum kedaluwarsa
+  verifyRefreshToken(refreshToken);
 
   const tokenRow = await prisma.refreshToken.findUnique({
     where: { token: refreshToken },

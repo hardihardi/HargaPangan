@@ -17,6 +17,8 @@ export interface GovSyncResult {
   skipped: number;
 }
 
+type GovApiRow = Record<string, unknown>;
+
 /**
  * Sinkronisasi data harga dari API pemerintah Indonesia ke tabel DailyPrice.
  *
@@ -110,17 +112,29 @@ export async function syncGovernmentPrices(
   let updated = 0;
   let skipped = 0;
 
-  for (const row of rows) {
-    const r: any = row;
-
+  for (const row of rows as GovApiRow[]) {
     const provinceCode =
-      r.kode_provinsi ?? r.province_code ?? r.provinceCode ?? null;
+      (row["kode_provinsi"] ??
+        row["province_code"] ??
+        row["provinceCode"] ??
+        null) as string | number | null;
     const regencyCode =
-      r.kode_kabupaten ?? r.regency_code ?? r.regencyCode ?? null;
+      (row["kode_kabupaten"] ??
+        row["regency_code"] ??
+        row["regencyCode"] ??
+        null) as string | number | null;
     const commodityExternalId =
-      r.id_komoditas ?? r.commodity_id ?? r.commodityId ?? null;
-    const dateRaw = r.tanggal ?? r.date ?? null;
-    const priceRaw = r.harga ?? r.price ?? null;
+      (row["id_komoditas"] ??
+        row["commodity_id"] ??
+        row["commodityId"] ??
+        null) as string | number | null;
+    const dateRaw = (row["tanggal"] ?? row["date"] ?? null) as
+      | string
+      | null;
+    const priceRaw = (row["harga"] ?? row["price"] ?? null) as
+      | string
+      | number
+      | null;
 
     if (
       provinceCode == null ||

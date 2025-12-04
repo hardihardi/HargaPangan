@@ -8,6 +8,7 @@ import {
   manualPriceInputSchema,
   predictionRequestSchema,
   generatePredictions,
+  priceQuerySchema,
 } from "../services/priceService";
 
 const router = Router();
@@ -44,15 +45,25 @@ router.get(
   async (req, res, next) => {
     try {
       const query = {
-        ...req.query,
+        provinceId: req.query.provinceId
+          ? Number(req.query.provinceId)
+          : undefined,
+        regencyId: req.query.regencyId
+          ? Number(req.query.regencyId)
+          : undefined,
+        commodityId: req.query.commodityId
+          ? Number(req.query.commodityId)
+          : undefined,
         dateFrom: req.query.dateFrom
           ? new Date(String(req.query.dateFrom))
           : undefined,
         dateTo: req.query.dateTo
           ? new Date(String(req.query.dateTo))
           : undefined,
-      };
-      const result = await listDailyPrices(query as any);
+        skip: Number(req.query.skip ?? 0),
+        take: Number(req.query.take ?? 20),
+      } satisfies z.infer<typeof priceQuerySchema>;
+      const result = await listDailyPrices(query);
       res.json(result);
     } catch (err) {
       next(err);
