@@ -13,7 +13,6 @@ import {
 } from "../services/userService";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { z } from "zod";
-import type { Role } from "@prisma/client";
 
 const router = Router();
 
@@ -52,7 +51,7 @@ router.post(
 router.get(
   "/users",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   async (_req, res, next) => {
     try {
       const users = await listUsers();
@@ -66,7 +65,7 @@ router.get(
 router.post(
   "/users",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({ body: createUserSchema }),
   async (req, res, next) => {
     try {
@@ -81,7 +80,7 @@ router.post(
 router.put(
   "/users/:id",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
     body: updateUserSchema,
@@ -100,7 +99,7 @@ router.put(
 router.post(
   "/users/:id/reset-password",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
     body: z.object({ newPassword: z.string().min(6) }),
@@ -119,7 +118,7 @@ router.post(
 router.post(
   "/users/:id/activate",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
     body: z.object({ isActive: z.boolean() }),

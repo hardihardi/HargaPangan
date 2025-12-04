@@ -44,6 +44,26 @@ export function DataHargaPage() {
     },
   });
 
+  const [syncRange, setSyncRange] = useState({
+    dateFrom: "",
+    dateTo: "",
+  });
+
+  const syncGovMutation = useMutation({
+    mutationFn: async () => {
+      await apiClient.post("/integrations/gov/prices/sync", undefined, {
+        params: {
+          dateFrom: syncRange.dateFrom || undefined,
+          dateTo: syncRange.dateTo || undefined,
+        },
+      });
+    },
+    onSuccess: () => {
+      // Harga yang baru tersinkronisasi bisa langsung muncul di tabel manual
+      queryClient.invalidateQueries({ queryKey: ["prices"] });
+    },
+  });
+
   const regenciesQuery = useQuery<Option[]>({
     queryKey: ["regencies", filter.provinceId],
     enabled: !!filter.provinceId,
@@ -307,17 +327,117 @@ export function DataHargaPage() {
       {mode === "api" && (
         <div className="rounded-xl bg-slate-900/80 p-4 text-xs ring-1 ring-slate-800">
           <h2 className="text-sm font-semibold text-slate-50">
-            Integrasi API Harga Pangan
+            Integrasi API Harga Pangan Pemerintah
           </h2>
           <p className="mt-1 text-xs text-slate-400">
-            Konfigurasi endpoint API eksternal dapat disimpan melalui backend.
-            Halaman ini menyediakan placeholder untuk pengaturan API pemerintah,
-            API key, dan tombol sinkronisasi.
+            Gunakan fitur ini untuk menarik data harga pangan dari API resmi
+            pemerintah Indonesia (misalnya Panel Harga Pangan / layanan lain)
+            yang dilindungi dengan API key.
           </p>
-          <p className="mt-3 text-slate-300">
-            Implementasi penuh integrasi (penarikan data dan log sinkronisasi)
-            sudah disiapkan di layer backend dan dapat dihubungkan ke form ini.
-          </p>
+
+          <div className="mt-4 grid gap-3 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1.7fr)]">
+            <div className="space-y-3">
+              <div className="flex flex-col gap-1">
+                <label className="font-medium text-slate-200">
+                  Rentang Tanggal Sinkronisasi
+                </label>
+                <p className="text-[11px] text-slate-400">
+                  Jika dikosongkan, sistem akan menarik data sekitar 7 hari
+                  terakhir sesuai konfigurasi backend.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 gap-2 text-xs sm:grid-cols-2">
+                <div className="flex flex-col gap-1">
+                  <label>Dari tanggal</label>
+                  <input
+                    type="date"
+                    value={syncRange.dateFrom}
+                    onChange={(e) =>
+                      setSyncRange((r) => ({ ...r, dateFrom: e.target.value }))
+                    }
+                    className="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label>Sampai tanggal</label>
+                  <input
+                    type="date"
+                    value={syncRange.dateTo}
+                    onChange={(e) =>
+                      setSyncRange((r) => ({ ...r, dateTo: e.target.value }))
+                    }
+                    className="rounded-lg border border-slate-700 bg-slate-900 px-2 py-1 text-xs"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => syncGovMutation.mutate()}
+                disabled={syncGovMutation.isPending}
+                className="mt-2 inline-flex items-center justify-center rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-slate-950 hover:bg-emerald-400 disabled:opacity-60"
+              >
+                {syncGovMutation.isPending
+                  ? "Sinkronisasi..."
+                  : "Sinkronkan Data dari API Pemerintah"}
+              </button>
+
+              {syncGovMutation.isError && (
+                <p className="text-[11px] text-red-400">
+                  Gagal sinkronisasi dari API pemerintah. Periksa konfigurasi
+                  API di backend (GOV_API_BASE_URL dan GOV_API_KEY) serta
+                  format response API.
+                </p>
+              )}
+              {syncGovMutation.isSuccess && (
+                <p className="text-[11px] text-emerald-400">
+                  Permintaan sinkronisasi telah dikirim. Data yang berhasil
+                  dimuat akan muncul pada tabel harga setelah beberapa saat.
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-lg border border-dashed border-slate-700 bg-slate-950/60 p-3">
+              <h3 className="text-[11px] font-semibold text-slate-200">
+                Cara Konfigurasi API Pemerintah
+              </h3>
+              <ol className="mt-2 list-decimal space-y-1 pl-4 text-[11px] text-slate-300">
+                <li>
+                  Dapatkan akses dan API key resmi dari instansi pemerintah
+                  penyedia data harga pangan (misalnya Badan Pangan Nasional /
+                  Kementerian terkait).
+                </li>
+                <li>
+                  Isi variabel environment di backend:
+                  <code className="ml-1 rounded bg-slate-800 px-1">
+                    GOV_API_BASE_URL
+                  </code>{" "}
+                  dan{" "}
+                  <code className="rounded bg-slate-800 px-1">
+                    GOV_API_KEY
+                  </code>
+                  .
+                </li>
+                <li>
+                  Sesuaikan pemetaan field di service backend{" "}
+                  <code className="rounded bg-slate-800 px-1">
+                    govPriceService.ts
+                  </code>{" "}
+                  agar nama kolom (kode_provinsi, tanggal, harga, dsb.) cocok
+                  dengan spesifikasi API Anda.
+                </li>
+                <li>
+                  Jalankan tombol sinkronisasi di atas untuk menarik data dan
+                  menyimpannya ke tabel{" "}
+                  <code className="rounded bg-slate-800 px-1">
+                    DailyPrice
+                  </code>
+                  . Setiap proses akan dicatat ke{" "}
+                  <code className="rounded bg-slate-800 px-1">SyncLog</code>.
+                </li>
+              </ol>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -16,7 +16,6 @@ import {
   updateRegency,
   updateRegencySchema,
 } from "../services/regionService";
-import type { Role } from "@prisma/client";
 
 const router = Router();
 
@@ -33,7 +32,7 @@ router.get("/provinces", async (_req, res, next) => {
 router.post(
   "/provinces",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({ body: createProvinceSchema }),
   async (req, res, next) => {
     try {
@@ -48,7 +47,7 @@ router.post(
 router.put(
   "/provinces/:id",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
     body: updateProvinceSchema,
@@ -66,7 +65,7 @@ router.put(
 router.delete(
   "/provinces/:id",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
   }),
@@ -106,7 +105,7 @@ router.get(
 router.post(
   "/regencies",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({ body: createRegencySchema }),
   async (req, res, next) => {
     try {
@@ -121,7 +120,7 @@ router.post(
 router.put(
   "/regencies/:id",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
     body: updateRegencySchema,
@@ -139,7 +138,7 @@ router.put(
 router.delete(
   "/regencies/:id",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
   }),

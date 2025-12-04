@@ -16,6 +16,9 @@ const envSchema = z.object({
     .url()
     .default("http://localhost:5000"),
   CORS_ORIGIN: z.string().optional(),
+  // Opsional: integrasi API harga pangan pemerintah
+  GOV_API_BASE_URL: z.string().url().optional(),
+  GOV_API_KEY: z.string().optional(),
 });
 
 export const env = envSchema.parse(process.env);

@@ -53,7 +53,7 @@ model DailyPrice {
   regencyId   Int
   commodityId Int
   date        DateTime
-  price       Decimal         @db.Numeric(12, 2)
+  price       Decimal         @db.Decimal(12, 2)
   source      String
   createdAt   DateTime        @default(now())
   updatedAt   DateTime        @updatedAt
@@ -71,7 +71,7 @@ model PricePrediction {
   regencyId      Int
   commodityId    Int
   predictionDate DateTime
-  predictedPrice Decimal   @db.Numeric(12, 2)
+  predictedPrice Decimal   @db.Decimal(12, 2)
   modelName      String
   createdAt      DateTime  @default(now())
 

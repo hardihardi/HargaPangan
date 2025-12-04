@@ -6,6 +6,7 @@ import priceRoutes from "./priceRoutes";
 import modelRoutes from "./modelRoutes";
 import reportRoutes from "./reportRoutes";
 import dashboardRoutes from "./dashboardRoutes";
+import integrationRoutes from "./integrationRoutes";
 
 const router = Router();
 
@@ -16,5 +17,6 @@ router.use("/prices", priceRoutes);
 router.use("/models", modelRoutes);
 router.use("/reports", reportRoutes);
 router.use("/dashboard", dashboardRoutes);
+router.use("/integrations", integrationRoutes);
 
 export default router;

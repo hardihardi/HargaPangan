@@ -1,4 +1,3 @@
-import type { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "../config/prisma";
@@ -7,6 +6,7 @@ import {
   signRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt";
+import { RoleValues } from "../types/role";
 
 export const loginSchema = z.object({
   email: z.string().email(),
@@ -17,12 +17,12 @@ export const createUserSchema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(6),
-  role: z.nativeEnum(Role),
+  role: z.nativeEnum(RoleValues),
 });
 
 export const updateUserSchema = z.object({
   name: z.string().min(1).optional(),
-  role: z.nativeEnum(Role).optional(),
+  role: z.nativeEnum(RoleValues).optional(),
   isActive: z.boolean().optional(),
 });
 

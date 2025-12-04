@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { z } from "zod";
-import type { Role } from "@prisma/client";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
 import {
@@ -28,7 +27,7 @@ router.get("/", async (_req, res, next) => {
 router.post(
   "/",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({ body: commoditySchema }),
   async (req, res, next) => {
     try {
@@ -43,7 +42,7 @@ router.post(
 router.put(
   "/:id",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
     body: updateCommoditySchema,
@@ -61,7 +60,7 @@ router.put(
 router.post(
   "/:id/toggle",
   authMiddleware,
-  requireRole(Role.ADMIN),
+  requireRole("ADMIN"),
   validateRequest({
     params: z.object({ id: z.coerce.number().int().positive() }),
     body: z.object({ isActive: z.boolean() }),
