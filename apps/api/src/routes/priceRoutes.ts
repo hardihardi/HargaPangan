@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { z } from "zod";
 import { authMiddleware } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
@@ -11,7 +11,8 @@ import {
   priceQuerySchema,
 } from "../services/priceService";
 
-const router = Router();
+const router: IRouter = Router();
+;
 
 // SSE clients
 type SseClient = {

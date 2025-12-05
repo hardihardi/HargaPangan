@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { validateRequest } from "../middleware/validateRequest";
 import {
   createUser,
@@ -14,7 +14,7 @@ import {
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { z } from "zod";
 
-const router = Router();
+const router: IRouter = Router();
 
 router.post(
   "/login",
@@ -87,7 +87,7 @@ router.put(
   }),
   async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = Number(req.params.id);
       const user = await updateUser(id, req.body);
       res.json(user);
     } catch (err) {
@@ -106,7 +106,7 @@ router.post(
   }),
   async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = Number(req.params.id);
       await resetPassword(id, req.body.newPassword);
       res.status(204).send();
     } catch (err) {
@@ -125,7 +125,7 @@ router.post(
   }),
   async (req, res, next) => {
     try {
-      const id = req.params.id;
+      const id = Number(req.params.id);
       await updateUser(id, { isActive: req.body.isActive });
       res.status(204).send();
     } catch (err) {

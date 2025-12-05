@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
@@ -17,7 +17,7 @@ import {
   updateRegencySchema,
 } from "../services/regionService";
 
-const router = Router();
+const router: IRouter = Router();
 
 // Provinsi (read-only endpoint dapat diakses publik)
 router.get("/provinces", async (_req, res, next) => {
@@ -54,7 +54,8 @@ router.put(
   }),
   async (req, res, next) => {
     try {
-      const province = await updateProvince(req.params.id, req.body);
+      const id = Number(req.params.id);
+      const province = await updateProvince(id, req.body);
       res.json(province);
     } catch (err) {
       next(err);
@@ -71,7 +72,8 @@ router.delete(
   }),
   async (req, res, next) => {
     try {
-      await deleteProvince(req.params.id);
+      const id = Number(req.params.id);
+      await deleteProvince(id);
       res.status(204).send();
     } catch (err) {
       next(err);
@@ -127,7 +129,8 @@ router.put(
   }),
   async (req, res, next) => {
     try {
-      const regency = await updateRegency(req.params.id, req.body);
+      const id = Number(req.params.id);
+      const regency = await updateRegency(id, req.body);
       res.json(regency);
     } catch (err) {
       next(err);
@@ -144,7 +147,8 @@ router.delete(
   }),
   async (req, res, next) => {
     try {
-      await deleteRegency(req.params.id);
+      const id = Number(req.params.id);
+      await deleteRegency(id);
       res.status(204).send();
     } catch (err) {
       next(err);

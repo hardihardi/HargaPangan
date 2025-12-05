@@ -1,4 +1,4 @@
-import express from "express";
+import express, { type Express } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import compression from "compression";
@@ -7,7 +7,7 @@ import { env } from "./config/env";
 import router from "./routes";
 import { errorHandler } from "./middleware/errorHandler";
 
-export const app = express();
+export const app: Express = express();
 
 app.use(helmet());
 app.use(

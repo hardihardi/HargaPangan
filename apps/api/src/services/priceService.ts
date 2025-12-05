@@ -4,6 +4,7 @@ import {
   mlPredict,
   type MlHistoryPoint,
   type MlPredictRequest,
+  type MlPredictResponsePoint,
 } from "./mlService";
 
 export const manualPriceInputSchema = z.object({
@@ -113,7 +114,9 @@ export async function generatePredictions(
     orderBy: { date: "asc" },
   });
 
-  const history: MlHistoryPoint[] = historyRows.map((row) => ({
+  type HistoryRow = (typeof historyRows)[number];
+
+  const history: MlHistoryPoint[] = historyRows.map((row: HistoryRow) => ({
     date: row.date.toISOString(),
     price: Number(row.price),
   }));
@@ -131,7 +134,7 @@ export async function generatePredictions(
 
   // simpan ke tabel prediksi_harga
   const created = await prisma.$transaction(
-    predictions.map((p) =>
+    predictions.map((p: MlPredictResponsePoint) =>
       prisma.pricePrediction.upsert({
         where: {
           provinceId_regencyId_commodityId_predictionDate: {

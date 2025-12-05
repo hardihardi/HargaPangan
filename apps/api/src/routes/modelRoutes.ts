@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
@@ -8,7 +8,7 @@ import {
   trainModel,
 } from "../services/modelService";
 
-const router = Router();
+const router: IRouter = Router();
 
 router.get(
   "/active",

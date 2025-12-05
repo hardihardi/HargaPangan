@@ -101,7 +101,7 @@ export async function listUsers() {
 }
 
 export async function createUser(input: z.infer<typeof createUserSchema>) {
-  const passwordHash = await bcrypt.hash(input.password, 10);
+  const passwordHash = await bcrypt.hash(String(input.password), 10);
 
   const user = await prisma.user.create({
     data: {
@@ -127,7 +127,7 @@ export async function updateUser(
 }
 
 export async function resetPassword(id: number, newPassword: string) {
-  const passwordHash = await bcrypt.hash(newPassword, 10);
+  const passwordHash = await bcrypt.hash(String(newPassword), 10);
   await prisma.user.update({
     where: { id },
     data: { passwordHash },

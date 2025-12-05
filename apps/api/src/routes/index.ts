@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import authRoutes from "./authRoutes";
 import regionRoutes from "./regionRoutes";
 import commodityRoutes from "./commodityRoutes";
@@ -8,7 +8,7 @@ import reportRoutes from "./reportRoutes";
 import dashboardRoutes from "./dashboardRoutes";
 import integrationRoutes from "./integrationRoutes";
 
-const router = Router();
+const router: IRouter = Router();
 
 router.use("/auth", authRoutes);
 router.use("/regions", regionRoutes);

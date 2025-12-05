@@ -20,7 +20,7 @@ export async function getDashboardSummary() {
   const oneWeekAgo = new Date(latestDate);
   oneWeekAgo.setDate(latestDate.getDate() - 7);
 
-  const [latestPrices, lastWeekPrices] = await Promise.all([
+  const [latestPricesRaw, lastWeekPricesRaw] = await Promise.all([
     prisma.dailyPrice.groupBy({
       by: ["commodityId"],
       where: { date: latestDate },
@@ -32,6 +32,14 @@ export async function getDashboardSummary() {
       _avg: { price: true },
     }),
   ]);
+
+  type GroupedPriceRow = {
+    commodityId: number;
+    _avg: { price: unknown };
+  };
+
+  const latestPrices = latestPricesRaw as GroupedPriceRow[];
+  const lastWeekPrices = lastWeekPricesRaw as GroupedPriceRow[];
 
   const priceChange: {
     commodityId: number;

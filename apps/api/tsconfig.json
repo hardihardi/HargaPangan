@@ -4,7 +4,9 @@
     "rootDir": "src",
     "outDir": "dist",
     "strict": true,
-    "noEmitOnError": true
+    "noEmitOnError": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node"
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

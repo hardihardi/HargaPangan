@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
@@ -7,7 +7,7 @@ import {
   exportReportToPdf,
 } from "../services/reportService";
 
-const router = Router();
+const router: IRouter = Router();
 
 const reportQuerySchema = z.object({
   commodityId: z.coerce.number().int().positive(),

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
@@ -7,7 +7,7 @@ import {
   syncGovernmentPrices,
 } from "../services/govPriceService";
 
-const router = Router();
+const router: IRouter = Router();
 
 const syncQuerySchema = z.object({
   dateFrom: z.string().optional(),

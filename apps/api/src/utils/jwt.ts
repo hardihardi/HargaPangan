@@ -47,17 +47,25 @@ export function signRefreshToken(user: {
 }
 
 export function verifyAccessToken(token: string): JwtPayload {
-  const decoded = jwt.verify(token, env.JWT_SECRET) as JwtPayload;
-  if (decoded.type !== "access") {
+  const decoded = jwt.verify(token, env.JWT_SECRET);
+  if (typeof decoded === "string") {
+    throw new Error("Invalid token payload");
+  }
+  const payload = decoded as unknown as JwtPayload;
+  if (payload.type !== "access") {
     throw new Error("Invalid token type");
   }
-  return decoded;
+  return payload;
 }
 
 export function verifyRefreshToken(token: string): JwtPayload {
-  const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET) as JwtPayload;
-  if (decoded.type !== "refresh") {
+  const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET);
+  if (typeof decoded === "string") {
+    throw new Error("Invalid token payload");
+  }
+  const payload = decoded as unknown as JwtPayload;
+  if (payload.type !== "refresh") {
     throw new Error("Invalid token type");
   }
-  return decoded;
+  return payload;
 }

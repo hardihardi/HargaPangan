@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, type IRouter } from "express";
 import { z } from "zod";
 import { authMiddleware, requireRole } from "../middleware/authMiddleware";
 import { validateRequest } from "../middleware/validateRequest";
@@ -12,7 +12,7 @@ import {
   createCommodity,
 } from "../services/commodityService";
 
-const router = Router();
+const router: IRouter = Router();
 
 // Listing komoditas bisa diakses publik (dashboard, filter, dsb)
 router.get("/", async (_req, res, next) => {
@@ -49,7 +49,8 @@ router.put(
   }),
   async (req, res, next) => {
     try {
-      const commodity = await updateCommodity(req.params.id, req.body);
+      const id = Number(req.params.id);
+      const commodity = await updateCommodity(id, req.body);
       res.json(commodity);
     } catch (err) {
       next(err);
@@ -67,10 +68,8 @@ router.post(
   }),
   async (req, res, next) => {
     try {
-      const commodity = await toggleCommodityActive(
-        req.params.id,
-        req.body.isActive,
-      );
+      const id = Number(req.params.id);
+      const commodity = await toggleCommodityActive(id, req.body.isActive);
       res.json(commodity);
     } catch (err) {
       next(err);
@@ -87,7 +86,8 @@ router.delete(
   }),
   async (req, res, next) => {
     try {
-      await deleteCommodity(req.params.id);
+      const id = Number(req.params.id);
+      await deleteCommodity(id);
       res.status(204).send();
     } catch (err) {
       next(err);
