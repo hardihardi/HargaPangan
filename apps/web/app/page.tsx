@@ -422,6 +422,11 @@ function AppShell() {
 }
 
 export default function Home() {
+  // Saat build/prerender di server, hindari rendering BrowserRouter
+  if (typeof window === "undefined") {
+    return null;
+  }
+
   return (
     <BrowserRouter>
       <AppShell />
